@@ -13,7 +13,7 @@ class DataStore {
     
 
     static let sharedDataStore = DataStore()
-    
+    var messages : [Message] = []
     
     // MARK: - Core Data Saving support
     
@@ -31,10 +31,39 @@ class DataStore {
         }
     }
     
-//        func fetchData ()
-//        {
-//         perform a fetch request to fill an array property on your datastore
-//        }
+    func fetchData () {
+        let fetch = NSFetchRequest(entityName: "Message")
+        
+        let createdAtSort = NSSortDescriptor(key: "createdAt", ascending: true)
+        fetch.sortDescriptors = [createdAtSort]
+        
+        do {
+           self.messages = try self.managedObjectContext.executeFetchRequest(fetch) as! [Message]
+        } catch let nserror as NSError {
+            print (nserror)
+        }
+    }
+    
+    func generateData() {
+        var message1 = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: self.managedObjectContext) as! Message
+        
+        message1.content = "Eldon"
+        message1.createdAt = NSDate()
+        
+        var message2 = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: self.managedObjectContext) as! Message
+        
+        message1.content = "Henry"
+        message1.createdAt = NSDate()
+        
+        var message3 = NSEntityDescription.insertNewObjectForEntityForName("Message", inManagedObjectContext: self.managedObjectContext) as! Message
+        
+        message1.content = "Ricky"
+        message1.createdAt = NSDate()
+        
+        saveContext()
+        fetchData()
+    }
+
 
     // MARK: - Core Data stack
     // Managed Object Context property getter. This is where we've dropped our "boilerplate" code.
@@ -50,7 +79,7 @@ class DataStore {
     
     lazy var managedObjectModel: NSManagedObjectModel = {
         // The managed object model for the application. This property is not optional. It is a fatal error for the application not to be able to find and load its model.
-        let modelURL = NSBundle.mainBundle().URLForResource("<#XCDATAMODELD_NAME#>", withExtension: "momd")!
+        let modelURL = NSBundle.mainBundle().URLForResource("slapChat", withExtension: "momd")!
         return NSManagedObjectModel(contentsOfURL: modelURL)!
     }()
     
